@@ -1,0 +1,34 @@
+% Main Document %
+
+% Load + Define document
+\documentclass[fontsize=11pt,paper=a5,pagesize=auto]{scrbook}
+
+\include{preambel}
+
+% Start Document
+\begin{document}
+
+% First pages
+\maketitle
+\tableofcontents
+
+% Add Content
+\include{content/preface}
+\part{Basics}
+\include{content/part_basics/introduction}
+\include{content/part_basics/machine_learning}
+\include{content/part_basics/neural_networks}
+\include{content/part_basics/foundation_models}
+\part{Neural Networks}
+\include{content/part_neural_networks/architectures}
+\include{content/part_neural_networks/learning_methods}
+% FIXME ...
+
+% \appendix
+% \include{}
+
+\end{document}
+
+
+
+
