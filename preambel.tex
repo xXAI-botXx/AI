@@ -2,6 +2,15 @@
 % === === ===
 % Extensions
 % === === ===
+% Set margins
+\usepackage[
+	a5paper,
+	top=2cm,
+	bottom=2cm,
+	left=2cm,
+	right=2cm
+]{geometry}
+
 % Font encoding & Font Style
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
@@ -15,6 +24,15 @@
 
 % Turn-Off additional space after a sentence
 \frenchspacing
+
+% Make hpyer links and references and table-of-content clickable
+\usepackage[
+	colorlinks=true,
+	linkcolor=black,      % for table-of-content & ref
+	urlcolor=blue,       % for URL links
+	citecolor=blue       % for \cite
+]{hyperref}
+
 
 % === === ===
 % General Book Information
