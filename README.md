@@ -95,13 +95,13 @@ I would like to introduce you to the tools **scipy.optimize**, **cvxpy** and **p
 
     **Goal Function**: Minimize -> $C = x^2 + y^2$ <br>  
     **Condition**:<br>
-    $
+    $$
     \begin{aligned}
     x + y &\geq 10 \\
     x &\geq 2 \\
     y &\geq 3
     \end{aligned}
-    $
+    $$
 
     ### Code:
 
@@ -141,13 +141,13 @@ I would like to introduce you to the tools **scipy.optimize**, **cvxpy** and **p
 
     **Goalfunction**: Minimize -> $C = 5x + 3y$ <br> 
     **Condition**:<br>
-    $
+    $$
     \begin{aligned}
     x + y &\geq 10 \\
     x &\geq 2 \\
     y &\geq 3
     \end{aligned}
-    $
+    $$
 
     Code:
 
@@ -190,13 +190,13 @@ I would like to introduce you to the tools **scipy.optimize**, **cvxpy** and **p
 
     **Goalfunction**: Minimize -> $C = 5x + 3y$ <br>
     **Condition**:<br>
-    $
+    $$
     \begin{aligned}
     x + y &\geq 10 \\
     x &\geq 2 \\
     y &\geq 3
     \end{aligned}
-    $
+    $$
 
     Code:
 
