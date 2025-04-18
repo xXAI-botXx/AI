@@ -53,15 +53,15 @@ I would like to introduce you to the tools **scipy.optimize**, **cvxpy** and **p
 
     Example: Linear optimization with `scipy.optimize.linprog`
 
-    **Goal Function**: Minimize \( C = 5x + 3y \)  
-    **Condition**:
-    \[
+    **Goal Function**: Minimize -> $C = 5x + 3y$ <br> 
+    **Condition**:<br>
+    $
     \begin{aligned}
     x + y &\geq 10 \\
     x &\geq 2 \\
     y &\geq 3
     \end{aligned}
-    \]
+    $
 
     Code:
 
@@ -93,15 +93,15 @@ I would like to introduce you to the tools **scipy.optimize**, **cvxpy** and **p
 
     Example: Quadratic optimization with `cvxpy`
 
-    **Goal Function**: Minimize \( C = x^2 + y^2 \)  
-    **Condition**:  
-    \[
+    **Goal Function**: Minimize -> $C = x^2 + y^2$ <br>  
+    **Condition**:<br>
+    $
     \begin{aligned}
     x + y &\geq 10 \\
     x &\geq 2 \\
     y &\geq 3
     \end{aligned}
-    \]
+    $
 
     ### Code:
 
@@ -139,15 +139,15 @@ I would like to introduce you to the tools **scipy.optimize**, **cvxpy** and **p
 
     Example linear optimization with `pyomo`
 
-    **Goalfunction**: Minimize \( C = 5x + 3y \)  
-    **Condition**:  
-    \[
+    **Goalfunction**: Minimize -> $C = 5x + 3y$ <br> 
+    **Condition**:<br>
+    $
     \begin{aligned}
     x + y &\geq 10 \\
     x &\geq 2 \\
     y &\geq 3
     \end{aligned}
-    \]
+    $
 
     Code:
 
@@ -188,15 +188,15 @@ I would like to introduce you to the tools **scipy.optimize**, **cvxpy** and **p
 
     Example linear optimization using a **Genetic Algorithm** (with `deap` library)
 
-    **Goalfunction**: Minimize \( C = 5x + 3y \)  
-    **Condition**:  
-    \[
+    **Goalfunction**: Minimize -> $C = 5x + 3y$ <br>
+    **Condition**:<br>
+    $
     \begin{aligned}
     x + y &\geq 10 \\
     x &\geq 2 \\
     y &\geq 3
     \end{aligned}
-    \]
+    $
 
     Code:
 
