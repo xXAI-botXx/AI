@@ -72,7 +72,7 @@ Table of Code:
 - **Analysis**
     - [UseCase NY Taxi](./src/examples/data_engineering/UseCase_NY_Taxi.ipynb)
     - [Feature Extraction](./src/examples/analysis/Feature_Extraction_Tobia.ipynb)
-    - [Example Data Analysis](./src/examples/analysis/Data_Analysis_Conveyor_Belt_Tobia.ipynb)
+    <!--- [Example Data Analysis](./src/examples/analysis/Data_Analysis_Conveyor_Belt_Tobia.ipynb)-->
 - **Sci-Kit Learn** (Sklearn)
     - [Basics](./src/examples/scikit-learn/basics.ipynb)
     - [Einführung Scikit-Learn](./src/examples/scikit-learn/Einführung_Scikit_Learn.ipynb)
