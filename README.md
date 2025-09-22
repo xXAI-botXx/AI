@@ -7,6 +7,7 @@ In PyTorch there are many repatitive tasks and code, and this repo wants to help
 
 
 Table of Contents:
+- [Math (for AI/Deep Learning)](./docs/math.md)
 - [PyTorch](./docs/pytorch.md)
 - [TensorFlow](./docs/tensorflow.md)
 - [Scikit Learn](./docs/scikit_learn.md)
@@ -112,13 +113,13 @@ Table of Code:
     - [CIFAR10 MLP](./src/examples/pytorch/CIFAR10_MLP.ipynb)
     - [CIFAR10 MLP optimization](./src/examples/pytorch/CIFAR10_MLP_optimization.ipynb)
     - [CIFAR10 CNN](./src/examples/pytorch/CIFAR10_CNN.ipynb)
-    - [ResNet (not finish)](./src/examples/resnet.ipynb)
+    - [ResNet (not finish)](./src/examples/pytorch/resnet.ipynb)
     - [ResNet as Python file](./src/examples/resnet.py)
-    - [ConvNext](./src/examples/ConvNext.ipynb)
-    - [Dino with insides](./src/examples/dino_inside.ipynb)
-    - [Clip and SWIN](./src/examples/CLIP_and_SWIN.ipynb)
-    - [UNet](./src/examples/Unet.ipynb)
-    - [MaskRCNN - Instance Segmentation](./src/examples/maskrcnn_toolkit.py) -> [see here if you want to know, how to use this py](https://github.com/xXAI-botXx/torch-mask-rcnn-instance-segmentation)
+    - [ConvNext](./src/examples/pytorch/ConvNext.ipynb)
+    - [Dino with insides](./src/examples/pytorch/dino_inside.ipynb)
+    - [Clip and SWIN](./src/examples/pytorch/CLIP_and_SWIN.ipynb)
+    - [UNet](./src/examples/pytorch/Unet.ipynb)
+    - [MaskRCNN - Instance Segmentation](./src/examples/pytorch/maskrcnn_toolkit.py) -> [see here if you want to know, how to use this py](https://github.com/xXAI-botXx/torch-mask-rcnn-instance-segmentation)
     - [Finetuning pretrained Transformer](./src/examples/pytorch/fine_tune_pre_trained_transformer.ipynb)
     - [Pretrained Vision Transformer](./src/examples/pytorch/pre_trained_vt.ipynb)
     - [GPT2 Inference](./src/examples/pytorch/GPT2_inference.ipynb)
@@ -478,8 +479,180 @@ I would like to introduce you to the tools **scipy.optimize**, **cvxpy** and **p
 
 [<img align="right" width=150px src='./res/rackete_2.png'></img>](#ai)
 
-Coming soon...
+## What is ONNX?
 
+**ONNX (Open Neural Network Exchange)** is an open standard for representing machine learning models.  
+It allows models trained in one framework (e.g., PyTorch, TensorFlow, Scikit-learn) to be exported and run in another framework or runtime (e.g., ONNX Runtime, TensorRT, OpenVINO).  
+
+Think of ONNX as a **universal file format for AI models** (`.onnx` files).
+
+<br><br>
+
+**Why ONNX?**
+
+- **Interoperability:** Train in PyTorch, deploy in C++, C#, Java, or edge devices.  
+- **Performance:** Optimized runtimes (ONNX Runtime, TensorRT) can run models faster than the original framework.  
+- **Deployment:** Standardized format works across platforms: cloud, mobile, IoT, and embedded devices.  
+- **Longevity:** Models remain usable even if the original framework changes.  
+
+<br><br>
+
+**Installing ONNX and ONNX Runtime**
+
+```bash
+# Install ONNX (model format support)
+pip install onnx
+
+# Install ONNX Runtime (for inference)
+pip install onnxruntime
+
+# For GPU acceleration
+pip install onnxruntime-gpu
+```
+
+<br><br>
+
+**Exporting Models to ONNX**
+
+PyTorch → ONNX
+```python
+import torch
+import torch.onnx as onnx
+import torch.nn as nn
+
+# Example model
+class SimpleModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc = nn.Linear(3, 2)
+
+    def forward(self, x):
+        return self.fc(x)
+
+model = SimpleModel()
+dummy_input = torch.randn(1, 3)
+
+# Export to ONNX
+torch.onnx.export(
+    model,                         # model
+    dummy_input,                   # example input
+    "simple_model.onnx",           # output file
+    input_names=["input"],
+    output_names=["output"],
+    dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}},
+    opset_version=14
+)
+```
+
+TensorFlow / Keras → ONNX
+```bash
+pip install tf2onnx
+```
+```python
+import tensorflow as tf
+import tf2onnx
+
+# Example Keras model
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(10, activation="relu", input_shape=(3,)),
+    tf.keras.layers.Dense(2, activation="softmax")
+])
+
+# Convert to ONNX
+spec = (tf.TensorSpec((None, 3), tf.float32, name="input"),)
+output_path = "keras_model.onnx"
+model_proto, _ = tf2onnx.convert.from_keras(model, input_signature=spec, output_path=output_path)
+```
+
+<br><br>
+
+**Running Inference with ONNX Runtime**
+
+```python
+import onnxruntime as ort
+import numpy as np
+
+# Load the model
+session = ort.InferenceSession("simple_model.onnx")
+
+# Input name (depends on export)
+input_name = session.get_inputs()[0].name
+output_name = session.get_outputs()[0].name
+
+# Run inference
+x = np.random.randn(1, 3).astype(np.float32)
+output = session.run([output_name], {input_name: x})
+
+print("Input:", x)
+print("Output:", output)
+```
+
+<br><br>
+
+**Converting Other Frameworks**
+
+- **Scikit-learn → ONNX**:
+    ```bash
+    pip install skl2onnx
+    ```
+    ```python
+    from sklearn.linear_model import LogisticRegression
+    from skl2onnx import convert_sklearn
+    from skl2onnx.common.data_types import FloatTensorType
+
+    model = LogisticRegression().fit([[0,0], [1,1]], [0,1])
+    initial_type = [("input", FloatTensorType([None, 2]))]
+    onnx_model = convert_sklearn(model, initial_types=initial_type)
+
+    with open("logreg.onnx", "wb") as f:
+        f.write(onnx_model.SerializeToString())
+    ```
+- **XGBoost / LightGBM** → ONNX via onnxmltools.
+
+<br><br>
+
+**Tools for Working with ONNX**
+
+- Netron (https://netron.app) → Visualize ONNX models.
+- **ONNX Runtime** → Inference engine (CPU/GPU/TPU).
+- **onnxmltools** → Convert models from various frameworks.
+- **ONNX Graph Optimizer** → Simplify and optimize models.
+
+<br><br>
+
+**Common Issues and Fixes**
+
+1. Opset version mismatch
+    - Always use a recent opset_version (13 or 14).
+    - Older opsets may lack operations from new frameworks.
+2. Dynamic shapes
+    - Use dynamic_axes when exporting (for variable batch size).
+3. Unsupported operations
+    - Some framework ops don’t map directly to ONNX.
+    - Solutions: rewrite model, or use onnx-simplifier.
+
+```bash
+pip install onnx-simplifier
+python3 -m onnxsim input.onnx output.onnx
+```
+
+<br><br>
+
+**ONNX in Deep Learning Deployment**
+
+- **Edge AI:** Run models on phones, IoT devices (via ONNX Runtime Mobile).
+- **Cloud inference:** Scalable APIs with ONNX Runtime in Python, C#, or C++.
+- **Hardware acceleration:** NVIDIA TensorRT, Intel OpenVINO, AMD ROCm all support ONNX.
+- **Cross-framework training:** Train in PyTorch → Deploy in TensorFlow Serving.
+
+<br><br>
+
+**Summary**
+
+ONNX is the universal file format for ML models.
+- Train anywhere.
+- Export to .onnx.
+- Deploy anywhere (fast, portable, hardware-accelerated).
 
 
 <br><br>
@@ -489,9 +662,296 @@ Coming soon...
 
 [<img align="right" width=150px src='./res/rackete_2.png'></img>](#ai)
 
-Coming soon...
+<br><br>
 
-(Weights & Biases, ML-Flow)
+**Why Experiment Tracking?**
+
+Training deep learning models involves many moving parts:
+- Different hyperparameters (learning rate, batch size, optimizer).
+- Different datasets or preprocessing methods.
+- Randomness from initialization or sampling.
+- Multiple model architectures.
+
+Without **experiment tracking**, it’s easy to lose track of what worked and why.  
+Tools like **Weights & Biases (W&B)** and **MLflow** help you:
+- Log hyperparameters, metrics, and artifacts (e.g., model checkpoints).
+- Visualize training progress in real time.
+- Compare runs systematically.
+- Collaborate with your team.
+
+<br><br>
+
+**Weights & Biases (W&B)**
+
+Installation
+
+```bash
+pip install wandb
+```
+
+Quickstart Example (PyTorch)
+```python
+import wandb
+import torch
+import torch.nn as nn
+import torch.optim as optim
+
+# Initialize a new W&B run
+wandb.init(project="my-first-experiment", config={
+    "epochs": 5,
+    "batch_size": 32,
+    "learning_rate": 0.001
+})
+
+# Example model
+model = nn.Linear(10, 2)
+optimizer = optim.Adam(model.parameters(), lr=wandb.config.learning_rate)
+loss_fn = nn.CrossEntropyLoss()
+
+# Training loop (dummy data)
+for epoch in range(wandb.config.epochs):
+    inputs = torch.randn(32, 10)
+    targets = torch.randint(0, 2, (32,))
+    outputs = model(inputs)
+    loss = loss_fn(outputs, targets)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+    # Log metrics
+    wandb.log({"epoch": epoch, "loss": loss.item()})
+```
+
+Features
+- Real-time dashboards for metrics and losses.
+- Hyperparameter sweeps (wandb sweep).
+- Save and visualize datasets and models.
+- Easy integration with PyTorch, TensorFlow, HuggingFace, Keras.
+
+<br><br>
+
+**MLflow**
+
+Installation
+
+```bash
+pip install mlflow
+```
+
+Quickstart Example
+```python
+import mlflow
+import mlflow.pytorch
+import torch
+import torch.nn as nn
+import torch.optim as optim
+
+# Example model
+model = nn.Linear(10, 2)
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+loss_fn = nn.CrossEntropyLoss()
+
+# Start an MLflow run
+with mlflow.start_run():
+    for epoch in range(5):
+        inputs = torch.randn(32, 10)
+        targets = torch.randint(0, 2, (32,))
+        outputs = model(inputs)
+        loss = loss_fn(outputs, targets)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        # Log metrics
+        mlflow.log_metric("loss", loss.item(), step=epoch)
+
+    # Save the model
+    mlflow.pytorch.log_model(model, "model")
+```
+
+Features
+- Log metrics, parameters, and models.
+- Built-in experiment UI (launch with mlflow ui).
+- Model registry for managing versions.
+- Supports multiple backends (local, S3, Azure, GCP).
+
+<br><br>
+
+Another bigger example
+```python
+# ...
+if using_experiment_tracking:
+
+        if create_new_experiment:
+            try:
+                EXPERIMENT_ID = mlflow.create_experiment(experiment_name)
+                log(log_path, f"Created Experiment '{experiment_name}' ID: {EXPERIMENT_ID}")
+            except mlflow.exceptions.MlflowException:
+                log(log_path, "WARNING: Please set 'CREATE_NEW_EXPERIMENT' to False!")
+
+        def is_mlflow_active():
+            return mlflow.active_run() is not None
+
+        if is_mlflow_active():
+            mlflow.end_run()
+
+        # set logs
+        existing_experiment = mlflow.get_experiment_by_name(experiment_name)
+        log(log_path, f"Loaded Experiment-System: {experiment_name}")
+
+        mlflow.set_experiment(experiment_name)
+
+        if using_experiment_tracking:
+            with mlflow.start_run():
+                mlflow.set_tag("mlflow.runName", NAME)
+
+                mlflow.log_param("name", NAME)
+                mlflow.log_param("epochs", num_epochs)
+                mlflow.log_param("batch_size", batch_size)
+                mlflow.log_param("learnrate", learning_rate)
+                mlflow.log_param("momentum", momentum)
+                mlflow.log_param("warm_up_iter", warm_up_iter)
+
+                mlflow.log_param("images_path", img_dir)
+                mlflow.log_param("masks_path", mask_dir)
+                mlflow.log_param("depth_path", depth_dir)
+
+                mlflow.log_param("data_shuffle", shuffle)
+                mlflow.log_param("data_mode", data_mode.value)
+                mlflow.log_param("data_amount", amount)
+                mlflow.log_param("start_idx", start_idx)
+                mlflow.log_param("end_idx", end_idx)
+
+                mlflow.log_param("train_data_size", len(dataset))
+                
+                mlflow.log_param("apply_random_flip", apply_random_flip)
+                mlflow.log_param("apply_random_rotation", apply_random_rotation)
+                mlflow.log_param("apply_random_crop", apply_random_crop)
+                mlflow.log_param("apply_random_brightness_contrast", apply_random_brightness_contrast)
+                mlflow.log_param("apply_random_gaussian_noise", apply_random_gaussian_noise)
+                mlflow.log_param("apply_random_gaussian_blur", apply_random_gaussian_blur)
+                mlflow.log_param("apply_random_scale", apply_random_scale)
+
+                mlflow.pytorch.autolog()
+
+                train_loop( log_path=log_path, 
+                            learning_rate=learning_rate,                      
+                            momentum=momentum, # decay=decay, 
+                            warm_up_iter=warm_up_iter,
+                            num_epochs=num_epochs, 
+                            batch_size=batch_size,
+                            dataset=dataset, 
+                            data_loader=data_loader, 
+                            name=name, 
+                            experiment_tracking=True, 
+                            use_depth=use_depth,
+                            weights_path=weights_path, 
+                            should_log=True, 
+                            should_save=True,
+                            return_objective="None", 
+                            extended_version=extended_version)
+
+                # close experiment tracking
+                if is_mlflow_active():
+                    mlflow.end_run()
+    else:
+        train_loop(log_path=log_path, 
+                    learning_rate=learning_rate,                      
+                    momentum=momentum, # decay=decay, 
+                    warm_up_iter=warm_up_iter,
+                    num_epochs=num_epochs, 
+                    batch_size=batch_size,
+                    dataset=dataset, 
+                    data_loader=data_loader, 
+                    name=name, 
+                    experiment_tracking=False, 
+                    use_depth=use_depth,
+                    weights_path=weights_path, 
+                    should_log=True, 
+                    should_save=True,
+                    return_objective="None", 
+                    extended_version=extended_version)
+```
+
+<br><br>
+
+**TensorBoard**
+
+TensorBoard comes with TensorFlow, but can also be installed separately:
+```bash
+pip install tensorboard
+```
+
+Quickstart Example (PyTorch)
+```python
+from torch.utils.tensorboard import SummaryWriter
+import torch
+import torch.nn as nn
+import torch.optim as optim
+
+writer = SummaryWriter("runs/experiment1")
+
+# Example model
+model = nn.Linear(10, 2)
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+loss_fn = nn.CrossEntropyLoss()
+
+for epoch in range(5):
+    inputs = torch.randn(32, 10)
+    targets = torch.randint(0, 2, (32,))
+    outputs = model(inputs)
+    loss = loss_fn(outputs, targets)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+    # Log scalar metric
+    writer.add_scalar("Loss/train", loss.item(), epoch)
+
+    # Optionally log the model graph
+    if epoch == 0:
+        writer.add_graph(model, inputs)
+
+writer.close()
+```
+
+Another Example
+```python
+from torch.utils.tensorboard import SummaryWriter
+import torch
+import matplotlib.pyplot as plt
+
+writer = SummaryWriter("runs/experiment2")
+
+# Log scalar metrics
+for epoch in range(5):
+    writer.add_scalar("Loss/train", 0.9/(epoch+1), epoch)
+    writer.add_scalar("Accuracy/train", 0.5 + 0.1*epoch, epoch)
+
+# Log a histogram (e.g., model weights)
+weights = torch.randn(100)
+writer.add_histogram("Weights", weights, 0)
+
+# Log an image
+img = torch.rand(3, 64, 64)  # RGB image
+writer.add_image("Random Image", img, 0)
+
+writer.close()
+```
+
+Launch TensorBoard
+```bash
+tensorboard --logdir=runs
+```
+
+Then open http://localhost:6006 in your browser.
+
+Features
+- Real-time plots of metrics and losses.
+- Visualization of model graphs.
+- Embedding projector (for high-dimensional data).
+- Histograms of weights, biases, and activations.
+
 
 
 <br><br>
@@ -501,9 +961,150 @@ Coming soon...
 
 [<img align="right" width=150px src='./res/rackete_2.png'></img>](#ai)
 
-Coming soon...
+<br><br>
 
-(Neutron, Zetane, ...)
+**Why Visualization?**
+
+Visualization is crucial in AI/Deep Learning for several reasons:
+- **Understand Data:** Inspect datasets, distributions, class balance, anomalies.  
+- **Monitor Training:** Track losses, accuracy, gradients, and activations.  
+- **Debug Models:** Visualize model graphs, feature maps, and predictions.  
+- **Explainability:** Understand what the model is learning (important for trust).  
+- **Present Results:** Communicate findings to stakeholders effectively.
+
+<br><br>
+
+**Neutron**
+
+**Neutron** is a powerful **interactive 3D visualization and debugging tool** for neural networks.  
+
+- Features:
+    - Visualize **tensor flows** in your models.  
+    - Explore **activations and weights** interactively.  
+    - Inspect **model graphs** in real-time.  
+    - Supports PyTorch, TensorFlow, and ONNX models.  
+
+**Basic workflow:**
+1. Export model (PyTorch/ONNX).  
+2. Load in Neutron.  
+3. Interactively explore layers, activations, and gradients.  
+
+Website: [https://www.neutron.ai](https://www.neutron.ai)
+
+<br><br>
+
+**Zetane**
+
+**Zetane** is a **3D visualization and simulation platform** designed for AI workflows:
+
+- Features:
+    - Visualize **AI models in 3D** environments.  
+    - Analyze **predictions in context** (e.g., for robotics, computer vision).  
+    - Combine datasets, model outputs, and simulations.  
+    - Real-time inspection of AI pipelines.  
+
+**Basic workflow:**
+1. Import your model (ONNX, PyTorch, TensorFlow).  
+2. Load a dataset or simulation scene.  
+3. Visualize predictions, feature maps, and metrics in real-time.  
+
+Website: [https://www.zetane.com](https://www.zetane.com)
+
+<br><br>
+
+**Python Visualization Libraries**
+
+Even without specialized tools, Python offers powerful libraries:
+
+- **Matplotlib / Seaborn:**  
+    - Plot training curves, histograms, and distributions.  
+    - Example:
+        ```python
+        import matplotlib.pyplot as plt
+
+        epochs = [1, 2, 3, 4, 5]
+        loss = [0.9, 0.7, 0.5, 0.4, 0.3]
+
+        plt.plot(epochs, loss, label="Training Loss")
+        plt.xlabel("Epoch")
+        plt.ylabel("Loss")
+        plt.title("Training Curve")
+        plt.legend()
+        plt.show()
+        ```
+
+- **Plotly / Dash:**  
+    - Interactive dashboards for metrics and predictions.  
+    - Plotly Example:
+        ```python
+        import plotly.graph_objects as go
+
+        epochs = [1, 2, 3, 4, 5]
+        loss = [0.9, 0.7, 0.5, 0.4, 0.3]
+        accuracy = [0.55, 0.65, 0.75, 0.80, 0.85]
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=epochs, y=loss, mode='lines+markers', name='Loss'))
+        fig.add_trace(go.Scatter(x=epochs, y=accuracy, mode='lines+markers', name='Accuracy'))
+        fig.update_layout(title="Training Metrics", xaxis_title="Epoch", yaxis_title="Value")
+        fig.show()
+        ```
+    - Dash Example (Simple Web Dashboard):
+        ```python
+        import dash
+        from dash import dcc, html
+
+        app = dash.Dash(__name__)
+
+        app.layout = html.Div([
+            html.H1("Training Dashboard"),
+            dcc.Graph(
+                figure=fig  # Use the Plotly figure from above
+            )
+        ])
+
+        if __name__ == "__main__":
+            app.run_server(debug=True)
+        ```  
+- **Open3D / PyVista:**  
+    - Visualize 3D data like point clouds and meshes.
+    - Open3D:
+        ```python
+        import open3d as o3d
+        import numpy as np
+
+        # Create random point cloud
+        pcd = o3d.geometry.PointCloud()
+        points = np.random.rand(1000, 3)
+        pcd.points = o3d.utility.Vector3dVector(points)
+
+        # Visualize
+        o3d.visualization.draw_geometries([pcd])
+        ``` 
+    - PyVista:
+        ```python
+        import pyvista as pv
+        import numpy as np
+
+        # Create a sphere mesh
+        mesh = pv.Sphere(radius=1.0, theta_resolution=30, phi_resolution=30)
+
+        # Visualize
+        plotter = pv.Plotter()
+        plotter.add_mesh(mesh, color="orange", show_edges=True)
+        plotter.show()
+        ```
+
+<br><br>
+
+**Best Practises**
+
+- Visualize **raw data first**: check for anomalies, class imbalance, missing values.  
+- Track **training metrics in real time**.  
+- Visualize **model internals** (weights, gradients, activations) to debug or interpret.  
+- Use **interactive 3D visualization** for complex data (point clouds, 3D objects, robotics simulations).  
+- Combine **static plots and interactive dashboards** for reporting and analysis.
+
 
 <br><br>
 
@@ -527,9 +1128,157 @@ In the daily work life of an ai engineer or a ml engineer it is probably the mos
 
 [<img align="right" width=150px src='./res/rackete_2.png'></img>](#ai)
 
-Coming soon...
+<br><br>
 
+**Why Use Databases in AI / Deep Learning?**
 
+Databases are essential for:
+    - **Managing large datasets** efficiently.  
+    - **Storing model metadata** (hyperparameters, metrics, checkpoints).  
+    - **Serving predictions** in production pipelines.  
+    - **Tracking experiments** over time (can integrate with MLflow/W&B).  
+
+Python provides rich libraries for both **SQL** and **NoSQL** databases.
+
+<br><br>
+
+**SQL Databases (Relational)**
+
+Common Libraries
+    - `sqlite3` → Built-in, lightweight, file-based SQL database.  
+    - `SQLAlchemy` → Object-relational mapping (ORM), supports multiple SQL backends.  
+    - `psycopg2` → PostgreSQL driver.  
+    - `mysql-connector-python` → MySQL driver.  
+
+Example: SQLite
+
+```python
+import sqlite3
+
+# Connect to database (file-based)
+conn = sqlite3.connect("ai_dataset.db")
+cursor = conn.cursor()
+
+# Create a table
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS experiments (
+    id INTEGER PRIMARY KEY,
+    model_name TEXT,
+    accuracy REAL,
+    loss REAL
+)
+""")
+
+# Insert a row
+cursor.execute("INSERT INTO experiments (model_name, accuracy, loss) VALUES (?, ?, ?)",
+               ("ResNet50", 0.87, 0.35))
+
+# Query data
+cursor.execute("SELECT * FROM experiments")
+rows = cursor.fetchall()
+for row in rows:
+    print(row)
+
+# Commit and close
+conn.commit()
+conn.close()
+```
+
+Example: SQLAlchemy (ORM)
+```python
+from sqlalchemy import create_engine, Column, Integer, String, Float
+from sqlalchemy.orm import declarative_base, sessionmaker
+
+Base = declarative_base()
+engine = create_engine("sqlite:///ai_dataset.db")
+Session = sessionmaker(bind=engine)
+session = Session()
+
+class Experiment(Base):
+    __tablename__ = "experiments"
+    id = Column(Integer, primary_key=True)
+    model_name = Column(String)
+    accuracy = Column(Float)
+    loss = Column(Float)
+
+Base.metadata.create_all(engine)
+
+# Add new experiment
+exp = Experiment(model_name="VGG16", accuracy=0.91, loss=0.28)
+session.add(exp)
+session.commit()
+
+# Query
+for e in session.query(Experiment).all():
+    print(e.model_name, e.accuracy, e.loss)
+```
+
+<br><br>
+
+**NoSQL Databases (Non-relational)**
+
+Common Libraries
+- `pymongo` → MongoDB driver.
+- `redis` → In-memory key-value store, good for caching and fast retrieval.
+- `tinydb` → Lightweight document database in Python (file-based).
+
+Example: MongoDB
+```python
+from pymongo import MongoClient
+
+# Connect to local MongoDB
+client = MongoClient("mongodb://localhost:27017/")
+db = client["ai_db"]
+collection = db["experiments"]
+
+# Insert a document
+collection.insert_one({
+    "model_name": "EfficientNet",
+    "accuracy": 0.93,
+    "loss": 0.25
+})
+
+# Query documents
+for doc in collection.find():
+    print(doc)
+```
+
+Example: Redis
+```python
+import redis
+
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+# Set a key-value pair
+r.set("ResNet50_accuracy", 0.87)
+
+# Get value
+accuracy = float(r.get("ResNet50_accuracy"))
+print("Accuracy:", accuracy)
+```
+
+<br><br>
+
+**Best Practices**
+
+- Choose the database type based on data and use case:
+    - Structured relational data → SQL
+    - Unstructured / document-based / fast caching → NoSQL
+- Use ORMs for easier model integration and maintainable code.
+- Index frequently queried fields for performance.
+- Secure credentials and connections (avoid hardcoding).
+- Integrate with experiment tracking for reproducibility.
+
+<br><br>
+
+**Summary**
+
+Python supports a wide variety of databases for AI workflows.
+- **SQL:** SQLite, PostgreSQL, MySQL (structured data, relational queries).
+- **NoSQL:** MongoDB, Redis, TinyDB (flexible schema, fast access).
+- Using the right database helps **manage datasets, store metrics, and serve models efficiently**.
+
+> Also see **Data Engineering** part in table of content.
 
 <br><br>
 
