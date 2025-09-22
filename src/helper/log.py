@@ -3,7 +3,7 @@ import os
 
 
 def log(content:str, path="./logs", file_name="output.log", 
-        clear_log=False, add_backslash=True) -> None:
+        clear_log=False, add_newline=True) -> None:
     """
     Saves your content into a log file.
 
@@ -17,7 +17,7 @@ def log(content:str, path="./logs", file_name="output.log",
         Name of the log file. With or without .log, both is ok.
     - clear_log : bool, optional (default=False)
         Whether to clear the logfile. You may want to set this to True on your first logging.
-    - add_backslash : bool, optional (default=True)
+    - add_newline : bool, optional (default=True)
         Decides if a backslash should be added to the end of your content.
     """
     # check/add log ending
@@ -36,16 +36,12 @@ def log(content:str, path="./logs", file_name="output.log",
         mode = 'a' if os.path.exists(path_to_file) else 'w'
 
     # adding \n
-    if add_backslash:
+    if add_newline:
         content += "\n"
 
     # logging/writing
-    try:
-        with open(path_to_file, mode) as f:
-            f.write(content)
-    except UnicodeEncodeError:
-        with open(path_to_file, mode, encoding="utf-8") as f:
-            f.write(content)
+    with open(path_to_file, mode, encoding="utf-8") as f:
+        f.write(content)
 
 
 

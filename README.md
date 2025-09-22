@@ -179,10 +179,11 @@ Table of Code:
     - [Organizing Hyperparameter Sweeps in PyTorch with W&B](./src/examples/ml_systems/Organizing_Hyperparameter_Sweeps_in_PyTorch_with_W&B.ipynb)
 - **Helper**
     - [Image Plotting](./src/helper/imshow.py) -> [or use it directly from the pip packages prime_printer](https://github.com/xXAI-botXx/prime_printer)
+    - [Interactive Image Plotting](./src/helper/imshow_interactive.py)
     - [Hardware Check](./src/helper/hardware_check.py) -> [or use it directly from the pip packages prime_printer](https://github.com/xXAI-botXx/prime_printer)
     - [Logging](./src/helper/log.py) -> [or use it directly from the pip packages prime_printer](https://github.com/xXAI-botXx/prime_printer)
     - [Time](./src/helper/time.py) -> [or use it directly from the pip packages prime_printer](https://github.com/xXAI-botXx/prime_printer)
-    - [Progress Bar](./src/helper/progress_bar.py) -> [or use it directly from the pip packages prime_printer](https://github.com/xXAI-botXx/prime_printer)
+    - [Progressbar and more use from the pip packages prime_printer](https://github.com/xXAI-botXx/prime_printer)
 
 
 > Note that the license vary. Some code is from me, some from my universities lectures (Prof. Janis Keuper & Prof. Daniela Oelke).
